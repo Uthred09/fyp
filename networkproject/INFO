@@ -1,0 +1,16 @@
+[0;1;32m●[0m redis-server.service - Advanced key-value store
+     Loaded: loaded (]8;;file://kali/usr/lib/systemd/system/redis-server.service\/usr/lib/systemd/system/redis-server.service]8;;\; [0;1;32menabled[0m; preset: [0;1;38:5:185mdisabled[0m)
+     Active: [0;1;32mactive (running)[0m since Sat 2025-03-01 11:06:44 EST; 29s ago
+ Invocation: 53bb000c785848edad18fb5a71544ec3
+       Docs: ]8;;http://redis.io/documentation,\http://redis.io/documentation,]8;;\
+             ]8;;man:redis-server(1)\man:redis-server(1)]8;;\
+   Main PID: 53383 (redis-server)
+     Status: "[0;1;36mReady to accept connections[0m"
+      Tasks: 5[0;38;5;245m (limit: 4546)[0m
+     Memory: 8.8M (peak: 9.1M)
+        CPU: 89ms
+     CGroup: /system.slice/redis-server.service
+             └─[0;38;5;245m53383 "/usr/bin/redis-server 127.0.0.1:6379"[0m
+
+Mar 01 11:06:44 kali systemd[1]: Starting redis-server.service - Advanced key-value store...
+Mar 01 11:06:44 kali systemd[1]: Started redis-server.service - Advanced key-value store.

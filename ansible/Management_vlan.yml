@@ -1,0 +1,41 @@
+---
+- name: Configure Management VLAN on Switch
+  hosts: switches
+  gather_facts: no
+  collections:
+    - cisco.ios
+
+  vars:
+    vlan_id: 99
+    interfaces:
+      - name: GigabitEthernet0/1
+        description: Connected_to_CoreRouter1
+      - name: GigabitEthernet0/2
+        description: Connected_to_CoreRouter2
+      - name: GigabitEthernet0/3
+        description: Connected_to_L3Switch1
+      - name: GigabitEthernet1/0
+        description: Connected_to_L3Switch2
+      - name: GigabitEthernet1/1
+        description: Connected_to_L3Switch3
+      - name: GigabitEthernet1/2
+        description: Connected_to_L3Switch4
+      - name: GigabitEthernet1/3
+        description: Connected_to_L2Switch1
+      - name: GigabitEthernet2/0
+        description: Connected_to_L2Switch2
+
+  tasks:
+    - name: Configure Interfaces
+      ios_config:
+        lines:
+          - "description {{ item.description }}"
+          - "switchport mode access"
+          - "switchport access vlan {{ vlan_id }}"
+        parents: "interface {{ item.name }}"
+      loop: "{{ interfaces }}"
+      
+    - name: save config
+      ios_config:
+        lines:
+          - "do wr"

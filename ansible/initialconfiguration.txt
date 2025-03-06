@@ -1,0 +1,28 @@
+
+enable
+configure terminal
+username admin privilege 15 secret cisco
+ip domain-name example.com
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line vty 0 4
+transport input ssh
+login local
+exit
+do wr
+
+
+
+vlan 99
+name Management
+exit
+interface vlan 99
+ip add <Assigned_IP> <SubnetMask>
+no shutdown
+exit
+interface <Name_of_Interface_connected_to_ManagementSwitch>
+    switchport mode access
+    switchport access vlan 99
+    description Connected_to_ManagementSwitch
+    exit
+do wr

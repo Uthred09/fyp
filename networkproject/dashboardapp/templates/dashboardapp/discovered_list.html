@@ -1,0 +1,49 @@
+{% extends 'dashboardapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Discovered Devices</h1>
+<div id="scan-status"></div>
+
+{% if discovered %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>IP Address</th>
+        <th>Hostname</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for dev in discovered %}
+      <tr>
+        <td>{{ dev.ip_address }}</td>
+        <td>{{ dev.hostname }}</td>
+        <td>{{ dev.status }}</td>
+        <td>
+          <!-- Confirm if status=Online or Offline, your call -->
+          {% if not dev.confirmed %}
+            <form action="{% url 'confirm_discovered_device' dev.pk %}" method="post" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+            </form>
+          {% endif %}
+
+          <!-- Delete -->
+          {% if not dev.confirmed %}
+            <form action="{% url 'delete_discovered_device' dev.pk %}" method="post" style="display:inline; margin-left:5px;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No newly discovered devices.</p>
+{% endif %}
+{% endblock %}
+

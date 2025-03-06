@@ -1,0 +1,41 @@
+{% extends 'dashboardapp/base.html' %}
+
+{% block content %}
+<h1>Devices</h1>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>IP</th>
+      <th>Hostname</th>
+      <th>Type</th>
+      <th>Location</th>
+      <th>Interfaces</th>
+      <th>Status</th>
+      <th>Action</th></tr>
+  </thead>
+  <tbody>
+  {% for dev in devices %}
+    <tr>
+      <td>{{ dev.ip_address }}</td>
+      <td>{{ dev.hostname }}</td>
+      <td>{{ dev.device_type }}</td>
+      <td>{{ dev.location }}</td>
+      <td>{{ dev.status }}</td>
+      <td>
+        {% for iface in dev.interfaces.all %}
+          <div>{{ iface.name }} ({{ iface.status }})</div>
+        {% empty %}
+          <em>No interfaces polled yet</em>
+        {% endfor %}
+      </td>
+      <td>
+        <form method="POST" action="{% url 'delete_device' dev.pk %}" onsubmit="return confirm('Are you sure you want to delete this device?');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

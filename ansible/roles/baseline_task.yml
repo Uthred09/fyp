@@ -1,0 +1,38 @@
+---
+- name: Basic Configuration
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  
+  tasks:
+    - name: Configure SNMP community
+      ios_config:
+        lines:
+          - snmp-server community public RO
+          - snmp-server location "DataCenter1"
+          - snmp-server contact admin@example.com
+
+    - name: Configure SNMP trap
+      ios_config:
+        lines:
+          - snmp-server enable traps snmp linkdown linkup
+          - snmp-server host 192.168.10.2 version 2c public
+
+    - name: Set device hostname based on inventory name and privileged password
+      ios_config:
+        lines:
+          - hostname {{ inventory_hostname }}
+          - enable secret cisco
+          - line console 0
+          - password console123
+          - login
+
+    - name: Configure Banner MOTD
+      ios_config:
+        lines:
+          - banner motd ^Unauthorized Access Denied^
+
+    - name: Save configuration
+      ios_config:
+        lines:
+          - do write memory
