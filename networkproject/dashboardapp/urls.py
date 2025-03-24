@@ -8,7 +8,7 @@ from .views import (
     delete_device_view,
     
 )
-
+    
 urlpatterns = [
     path('', dashboard_view, name='dashboard'),
     path('discovered/', discovered_list, name='discovered_list'),

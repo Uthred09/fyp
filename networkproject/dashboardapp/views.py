@@ -15,7 +15,7 @@ def dashboard_view(request):
     devices = Device.objects.prefetch_related('interfaces').all()
     return render(request, "dashboardapp/dashboard.html", {"devices": devices})
 
-
+@login_required
 def scan_network_view(request):
     if request.method == 'POST':
         # Trigger the Celery task
@@ -69,9 +69,6 @@ def delete_discovered_device(request, pk):
 
 
 def delete_device_view(request, pk):
-    """
-    Deletes a device from the database.
-    """
     device = get_object_or_404(Device, pk=pk)
 
     if request.method == 'POST':

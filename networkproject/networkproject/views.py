@@ -12,10 +12,10 @@ def run_ansible_playbook():
     return result.stdout, result.stderr
 
 
-def dashboard_view(request):
+def home_view(request):
     """View to display data from Ansible."""
     stdout, stderr = run_ansible_playbook()
-    return render(request, 'monitoring/dashboard.html', {
+    return render(request, 'index.html', {
         "stdout": stdout,  # Ansible output
         "stderr": stderr   # Any errors
     })

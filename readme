@@ -1,0 +1,6 @@
+command to start the project
+
+python manage.py runserver 
+celery -A networkproject worker --loglevel=info
+celery -A networkproject beat --loglevel=info
+python trap_reciever.py

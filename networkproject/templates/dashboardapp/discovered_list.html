@@ -13,6 +13,7 @@
         <th>Hostname</th>
         <th>Status</th>
         <th>Actions</th>
+        <th>last Seen</th>
       </tr>
     </thead>
     <tbody>
@@ -21,6 +22,7 @@
         <td>{{ dev.ip_address }}</td>
         <td>{{ dev.hostname }}</td>
         <td>{{ dev.status }}</td>
+        <td>{{ dev.last_seen}}</td>
         <td>
           <!-- Confirm if status=Online or Offline, your call -->
           {% if not dev.confirmed %}
@@ -45,5 +47,5 @@
 {% else %}
   <p>No newly discovered devices.</p>
 {% endif %}
-{% endblock %}
+{% endblock %} if request.method == 'POST':
 

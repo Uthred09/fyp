@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class DiscoveredDevice(models.Model):
     """
@@ -28,7 +29,11 @@ class Device(models.Model):
     contact = models.CharField(max_length=100, blank=True)
     location = models.CharField(max_length=100, blank=True)
     status = models.CharField(max_length=50, default='Unknown')
-    last_seen = models.DateTimeField(null=True, blank=True)
+    last_seen = models.DateTimeField(default=now)
+
+    @property
+    def device_resourcelatest(self):
+        return self.deviceresource_set.order_by('-timestamp').first()
 
     def __str__(self):
         return f"{self.hostname or self.ip_address}"
@@ -44,3 +49,15 @@ class NetworkInterface(models.Model):
 
     def __str__(self):
         return f"{self.device.hostname} - {self.name} ({self.status})"
+
+class DeviceResource(models.Model):
+    """
+    Stores historical resource usage for devices.
+    """
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)  # Link to Device
+    cpu_usage = models.FloatField(null=True, blank=True)
+    mem_usage = models.FloatField(null=True, blank=True)
+    timestamp = models.DateTimeField(default=now)  # Stores when the data was collected
+
+    def __str__(self):
+        return f"{self.device.hostname} - CPU: {self.cpu_usage}%, Mem: {self.mem_usage}%"

@@ -13,10 +13,14 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Discover tasks in all registered Django apps
 app.autodiscover_tasks()
 
-# Optional: Celery beat schedule (for periodic tasks)
+#Celery beat schedule (for periodic tasks)
 app.conf.beat_schedule = {
     'poll-snmp-every-5-min': {
         'task': 'dashboardapp.tasks.update_snmp_data',
-        'schedule': 3000.0,  # 300 seconds = 5 minutes
+        'schedule': 300.0,  # 300 seconds = 5 minutes
     },
+    'check_device_resources-every-30-second':{
+        'task':'dashboardapp.tasks.check_device_resources',
+        'schedule':30.0,
+    }
 }
