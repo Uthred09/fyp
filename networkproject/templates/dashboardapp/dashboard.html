@@ -2,46 +2,34 @@
 
 {% block content %}
 <h1>Devices</h1>
+
 <table class="table table-hover">
   <thead>
     <tr>
-      <th>IP</th>
       <th>Hostname</th>
-      <th>Type</th>
-      <th>Location</th>
-      <th>Interfaces</th>
       <th>Status</th>
-      <th>last_seen</th>
       <th>CPU Usage</th>
       <th>Memory Usage</th>
-      <th>last_pulled_time</th>
+      <th>Last Pulled Time</th>
       <th>Action</th>
     </tr>
   </thead>
   <tbody>
   {% for dev in devices %}
     <tr>
-      <td>{{ dev.ip_address }}</td>
-      <td>{{ dev.hostname }}</td>
-      <td>{{ dev.device_type }}</td>
-      <td>{{ dev.location }}</td>
+      <!-- Clickable Hostname -->
       <td>
-        {% for iface in dev.interfaces.all %}
-          <div>{{ iface.name }} ({{ iface.status }})</div>
-        {% empty %}
-          <em>No interfaces polled yet</em>
-        {% endfor %}
+        <button class="toggle-btn" onclick="toggleDetails({{ dev.pk }})">
+          {{ dev.hostname }}
+        </button>
       </td>
-      <td>{{dev.status }}</td>
-      <td>{{dev.last_seen}}</td>
-      {% if dev.device_resourcelatest%}
-        <td>
-            {{ dev.device_resourcelatest.cpu_usage }}%
-        </td>
-        <td>
-            {{ dev.device_resourcelatest.mem_usage }}%
-        </td>
+      <td>{{ dev.status }}</td>
+      {% if dev.device_resourcelatest %}
+        <td>{{ dev.device_resourcelatest.cpu_usage }}%</td>
+        <td>{{ dev.device_resourcelatest.mem_usage }}%</td>
         <td>{{ dev.device_resourcelatest.timestamp }}</td>
+      {% else %}
+        <td colspan="3">No Data</td>
       {% endif %}
       <td>
         <form method="POST" action="{% url 'delete_device' dev.pk %}" onsubmit="return confirm('Are you sure you want to delete this device?');">
@@ -50,7 +38,86 @@
         </form>
       </td>
     </tr>
+
+    <!-- Hidden Details Row -->
+    <tr id="device-{{ dev.pk }}" class="hidden-details">
+      <td colspan="6">
+        <div class="details">
+          <p><strong>IP Address:</strong> {{ dev.ip_address }}</p>
+          <p><strong>Type:</strong> {{ dev.device_type }}</p>
+          <p><strong>Location:</strong> {{ dev.location }}</p>
+          <p><strong>Interfaces:</strong></p>
+          <ul class="interface-list">
+            {% for iface in dev.interfaces.all %}
+              <li>
+                <span class="interface-name">{{ iface.name }}:</span>
+                <span class="interface-status {{ iface.status|lower }}">{{ iface.status }}</span>
+                <span class="bandwidth">In: {{ iface.bandwidth_in|floatformat:2 }} bps | Out: {{ iface.bandwidth_out|floatformat:2 }} bps</span>
+              </li>
+            {% empty %}
+              <li><em>No interfaces polled yet</em></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </td>
+    </tr>
   {% endfor %}
   </tbody>
 </table>
+
+<!-- CSS to Hide Details by Default & Format Interface Display -->
+<style>
+  .hidden-details {
+    display: none;
+  }
+  .toggle-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .toggle-btn:hover {
+    background-color: #0056b3;
+  }
+  .details {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  .interface-list {
+    list-style: none;
+    padding: 0;
+  }
+  .interface-list li {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+  }
+  .interface-name {
+    font-weight: bold;
+  }
+  .interface-status {
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-left: 5px;
+  }
+  .up { background-color: #28a745; color: white; }
+  .down { background-color: #dc3545; color: white; }
+  .bandwidth {
+    margin-left: 10px;
+    font-size: 0.9em;
+    color: #333;
+  }
+</style>
+
+<!-- JavaScript to Toggle Details -->
+<script>
+  function toggleDetails(deviceId) {
+    var row = document.getElementById("device-" + deviceId);
+    row.style.display = (row.style.display === "none" || row.style.display === "") ? "table-row" : "none";
+  }
+</script>
+
 {% endblock %}

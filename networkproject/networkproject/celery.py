@@ -17,7 +17,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'poll-snmp-every-5-min': {
         'task': 'dashboardapp.tasks.update_snmp_data',
-        'schedule': 300.0,  # 300 seconds = 5 minutes
+        'schedule': 60.0,  # 300 seconds = 5 minutes
     },
     'check_device_resources-every-30-second':{
         'task':'dashboardapp.tasks.check_device_resources',

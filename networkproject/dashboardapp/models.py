@@ -47,6 +47,15 @@ class NetworkInterface(models.Model):
     name = models.CharField(max_length=100)      # ifDescr
     status = models.CharField(max_length=50)     # ifOperStatus (e.g. "Up", "Down")
 
+    last_in_octets = models.BigIntegerField(default=0)
+    last_out_octets = models.BigIntegerField(default=0)
+    last_polled = models.DateTimeField(auto_now=True)
+
+    bandwidth_in = models.FloatField(default=0)  # in bps
+    bandwidth_out = models.FloatField(default=0)
+    utilization_in = models.FloatField(default=0)  # Percentage
+    utilization_out = models.FloatField(default=0)
+
     def __str__(self):
         return f"{self.device.hostname} - {self.name} ({self.status})"
 

@@ -11,7 +11,7 @@ from .models import Device, NetworkInterface, DiscoveredDevice, DeviceResource
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from networkproject import settings
 from django.core.mail import send_mail
-from django.utils import timezone
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -81,13 +81,15 @@ def scan_subnet(subnet="192.168.10.0/28", community="public"):
 
 # Common OIDs for SNMP
 OIDS = {
-    "sys_name": "1.3.6.1.2.1.1.5.0",       # Hostname
-    "sys_descr": "1.3.6.1.2.1.1.1.0",      # Device type (Description)
-    "sys_contact": "1.3.6.1.2.1.1.4.0",    # Admin contact
-    "sys_location": "1.3.6.1.2.1.1.6.0",   # Device location
-    "if_descr": "1.3.6.1.2.1.2.2.1.2",     # Interface name (ifDescr)
-    "if_status": "1.3.6.1.2.1.2.2.1.8",    # Interface status (ifOperStatus)
-    
+    "sys_name": "1.3.6.1.2.1.1.5.0",        # Hostname
+    "sys_descr": "1.3.6.1.2.1.1.1.0",       # Device type (Description)
+    "sys_contact": "1.3.6.1.2.1.1.4.0",     # Admin contact
+    "sys_location": "1.3.6.1.2.1.1.6.0",    # Device location
+    "if_descr": "1.3.6.1.2.1.2.2.1.2",      # Interface name (ifDescr)
+    "if_status": "1.3.6.1.2.1.2.2.1.8",     # Interface status (ifOperStatus)
+    "if_speed": "1.3.6.1.2.1.2.2.1.5",      # interface speed
+    "if_in_octets": "1.3.6.1.2.1.2.2.1.10", # interface incoming packet
+    "if_out_octets": "1.3.6.1.2.1.2.2.1.16" # interface outgoing packet
 }
 
 
@@ -105,18 +107,16 @@ def snmp_get(ip, community, oid):
     errorIndication, errorStatus, errorIndex, varBinds = result
 
     if errorIndication:
-        logger.error(f"SNMP GET error on {ip}: {errorIndication}")
-        return None
+        return logger.error(f"SNMP GET error on {ip}: {errorIndication}")
     if errorStatus:
-        logger.error(f"SNMP GET status error on {ip}: {errorStatus.prettyPrint()}")
-        return None
+        return logger.error(f"SNMP GET status error on {ip}: {errorStatus.prettyPrint()}")
     
     if varBinds:
         for binding in varBinds:
             print("Varbind: ", binding)
         return varBinds[0][1].prettyPrint()
     else:
-        return None
+        return logger.error(f"SNMP varbinds error; {ip} ") 
 
 
 def snmp_walk(ip, community, oid):
@@ -146,7 +146,7 @@ def poll_device_snmp(device, community='public'):
     """
     Poll SNMP data for a single device and update its details and interfaces when confirmation button is clicked.
     """
-    
+    logger.info(f"Polling SNMP data for {device.ip_address}...")
     # Get basic SNMP info
     sys_name = snmp_get(device.ip_address, community, OIDS["sys_name"])
     if sys_name:
@@ -166,19 +166,105 @@ def poll_device_snmp(device, community='public'):
     # Poll interface data
     iface_names = snmp_walk(device.ip_address, community, OIDS["if_descr"])
     iface_statuses = snmp_walk(device.ip_address, community, OIDS["if_status"])
+    iface_speeds = snmp_walk(device.ip_address, community, OIDS["if_speed"])  # in bps
 
-    # Clear out old interface data for the device
-    NetworkInterface.objects.filter(device=device).delete()
+    in_octets = snmp_walk(device.ip_address, community, OIDS["if_in_octets"])
+    out_octets = snmp_walk(device.ip_address, community, OIDS["if_out_octets"])
 
-    # Create new interface records
-    for i in range(min(len(iface_names), len(iface_statuses))):
-        name = iface_names[i]
-        status_val = iface_statuses[i]
-        status_str = "Up" if status_val == "1" else "Down"
-        NetworkInterface.objects.create(device=device, name=name, status=status_str)
+    current_time = timezone.now() # Timestamp for current polling
+
+    if not iface_names or not iface_statuses or not iface_speeds:
+        logger.warning(f"Failed to retrieve interface details for {device.ip_address}")
+        return "SNMP polling failed"
+
+    # Fetch previous polling data from the database
+    previous_interfaces = {iface.name: iface for iface in NetworkInterface.objects.filter(device=device)}
+
+
+    with transaction.atomic():
+        for i in range(min(len(iface_names), len(iface_statuses), len(iface_speeds), len(in_octets), len(out_octets))):
+            name = iface_names[i]
+            status = "Up" if iface_statuses[i] == "1" else "Down"
+            speed = int(iface_speeds[i]) if iface_speeds[i].isdigit() else 0  # bps
+            in_bytes = int(in_octets[i])
+            out_bytes = int(out_octets[i])
+
+            # Retrieve previous data if available
+            prev_data = previous_interfaces.get(name)
+
+            logger.info(prev_data)
+
+            if prev_data:
+                time_diff = (current_time - prev_data.last_polled).total_seconds()
+
+                # logger.info(time_diff)
+
+                if time_diff > 0:
+
+                    # Calculate Bandwidth Usage
+                    delta_in = (in_bytes - prev_data.last_in_octets) * 8  # Convert bytes to bits
+                    delta_out = (out_bytes - prev_data.last_out_octets) * 8
+
+                    bandwidth_in_bps = delta_in / time_diff
+                    bandwidth_out_bps = delta_out / time_diff
+
+                    utilization_in = (bandwidth_in_bps / speed) * 100 if speed > 0 else 0
+                    utilization_out = (bandwidth_out_bps / speed) * 100 if speed > 0 else 0
+ 
+                    # logger.info(bandwidth_in_bps, bandwidth_out_bps, utilization_in, utilization_out)
+
+                    # No previous data available, set bandwidth as 0 initially
+                    NetworkInterface.objects.update_or_create(
+                        device=device,
+                        name=name,
+                        defaults={
+                            "status": status,
+                            "bandwidth_in": bandwidth_in_bps,
+                            "bandwidth_out": bandwidth_out_bps,
+                            "utilization_in": utilization_in,
+                            "utilization_out": utilization_out,
+                            "last_in_octets": in_bytes,
+     S                       "last_out_octets": out_bytes,
+                            "last_polled": current_time,
+                        }
+                    )
+                else:
+                    logger.info("Error in time polling")
+            else:
+                # No previous data available, set bandwidth as 0 initially
+                # Create a new interface record if one doesn't exist
+                NetworkInterface.objects.update_or_create(
+                                device=device,
+                                name=name,
+                                defaults={
+                                    "status": status,
+                                    "bandwidth_in": 0,
+                                    "bandwidth_out": 0,
+                                    "utilization_in": 0,
+                                    "utilization_out": 0,
+                                    "last_in_octets":in_bytes,
+                                    "last_out_octets": out_bytes,
+                                    "last_polled": current_time,}
+                    )         
+
+    summary_message = f"Polled SNMP data for {device.ip_address}: {len(iface_names)} interfaces. "
     
-    logger.info(f"Polled SNMP data for {device.ip_address}: found {len(iface_names)} interfaces")
-    return f"Polled {len(iface_names)} interfaces"
+    interface_details = []
+    for interface in NetworkInterface.objects.filter(device=device):
+        interface_details.append(
+            f"Interface {interface.name} {interface.status} "
+            f"Bandwidth In: {interface.bandwidth_in} bps, "
+            f"Bandwidth Out: {interface.bandwidth_out} bps, "
+            f"Utilization In: {interface.utilization_in}%, "
+            f"Utilization Out: {interface.utilization_out}%"
+        )
+
+    if interface_details:
+        summary_message += "\n".join(interface_details)
+    else:
+        summary_message += "No interfaces found for this device."
+    
+    return summary_message
 
 @shared_task
 def update_snmp_data():
@@ -206,7 +292,8 @@ def update_snmp_data():
         if not sys_name:
             dev.status = "Down"
             dev.save()
-            continue
+        else:
+            logger.warning(f"SNMP sys_name retrieval failed for {dev.ip_address}")
         
         if not dev.hostname:
             new_devices += 1
@@ -216,9 +303,11 @@ def update_snmp_data():
         devices_updated += 1
 
     summary_message = (
-        f"SNMP data collection complete. Polled {total_polled} devices. "
-        f"Updated {devices_updated} devices. "
-        f"New devices found: {new_devices}."
+        f"\n{sys_name}\n"
+        f"SNMP data collection complete. Polled {total_polled} devices. \n"
+        f"Updated {devices_updated} devices. \n"
+        f"New devices found: {new_devices}.\n"
+        f"{poll_result}"
     )
     return summary_message
 
