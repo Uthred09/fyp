@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from networkproject import settings
 from django.core.mail import send_mail
 from django.db import transaction
+import gns3fy
 
 logger = logging.getLogger(__name__)
 
@@ -224,7 +225,7 @@ def poll_device_snmp(device, community='public'):
                             "utilization_in": utilization_in,
                             "utilization_out": utilization_out,
                             "last_in_octets": in_bytes,
-     S                       "last_out_octets": out_bytes,
+                            "last_out_octets": out_bytes,
                             "last_polled": current_time,
                         }
                     )

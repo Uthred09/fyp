@@ -1,0 +1,8 @@
+
+PLAY [Check if device is reachable] ********************************************
+
+TASK [Ping the device] *********************************************************
+[0;33mchanged: [localhost][0m
+
+PLAY RECAP *********************************************************************
+[0;33mlocalhost[0m                  : [0;32mok=1   [0m [0;33mchanged=1   [0m unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   

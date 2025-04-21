@@ -6,7 +6,6 @@ from .views import (
     scan_network_view,
     delete_discovered_device,
     delete_device_view,
-    
 )
     
 urlpatterns = [

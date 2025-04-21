@@ -1,0 +1,9 @@
+
+PLAY [Hostname Configuration] **************************************************
+
+TASK [Set a new hostname] ******************************************************
+[1;35mdevice[0m
+[0;33mchanged: [192.168.10.5][0m
+
+PLAY RECAP *********************************************************************
+[0;33m192.168.10.5[0m               : [0;32mok=1   [0m [0;33mchanged=1   [0m unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   

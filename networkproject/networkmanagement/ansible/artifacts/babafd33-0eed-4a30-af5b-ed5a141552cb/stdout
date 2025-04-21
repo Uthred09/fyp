@@ -1,0 +1,8 @@
+
+PLAY [Console Password Setup] **************************************************
+
+TASK [Set console line password] ***********************************************
+[0;31mfatal: [192.168.10.5]: FAILED! => {"changed": false, "module_stderr": "line console 0 4\r\nline console 0 4\r\n               ^\r\n% Invalid input detected at '^' marker.\r\n\r\ntest(config)#", "module_stdout": "", "msg": "MODULE FAILURE: No start of json char found\nSee stdout/stderr for the exact error"}[0m
+
+PLAY RECAP *********************************************************************
+[0;31m192.168.10.5[0m               : ok=0    changed=0    unreachable=0    [0;31mfailed=1   [0m skipped=0    rescued=0    ignored=0   

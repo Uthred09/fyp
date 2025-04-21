@@ -1,0 +1,14 @@
+
+PLAY [Configure VLAN and assign interface] *************************************
+
+TASK [Create VLAN] *************************************************************
+[1;35m[WARNING]: To ensure idempotency and correct diff the input configuration lines[0m
+[1;35mshould be similar to how they appear if present in the running configuration on[0m
+[1;35mdevice[0m
+[0;33mchanged: [192.168.10.5][0m
+
+TASK [Set interface mode and assign VLAN] **************************************
+[0;31mfatal: [192.168.10.5]: FAILED! => {"changed": false, "module_stderr": "switchport trunk vlan 10\r\nswitchport trunk vlan 10\r\n                 ^\r\n% Invalid input detected at '^' marker.\r\n\r\ntest(config-if)#", "module_stdout": "", "msg": "MODULE FAILURE: No start of json char found\nSee stdout/stderr for the exact error"}[0m
+
+PLAY RECAP *********************************************************************
+[0;31m192.168.10.5[0m               : [0;32mok=1   [0m [0;33mchanged=1   [0m unreachable=0    [0;31mfailed=1   [0m skipped=0    rescued=0    ignored=0   

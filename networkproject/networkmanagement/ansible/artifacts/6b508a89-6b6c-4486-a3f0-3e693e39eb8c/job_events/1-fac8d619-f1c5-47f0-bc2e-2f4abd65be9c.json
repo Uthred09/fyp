@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "fac8d619-f1c5-47f0-bc2e-2f4abd65be9c", "counter": 1, "stdout": "\u001b[0;31mERROR! 'ios_config' is not a valid attribute for a Play\u001b[0m", "start_line": 0, "end_line": 1, "runner_ident": "6b508a89-6b6c-4486-a3f0-3e693e39eb8c", "created": "2025-04-15T02:12:34.741586+00:00"}

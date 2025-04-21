@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'dashboardapp',
     'authentication',
     'django_celery_beat',
+    'networkmanagement',
 ]
 
 MIDDLEWARE = [

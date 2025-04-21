@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "a7775dcf-5925-4e66-8c28-b56cb7d0bd8e", "counter": 6, "stdout": "\u001b[1;35mshould be similar to how they appear if present in the running configuration on\u001b[0m", "start_line": 5, "end_line": 6, "runner_ident": "0bc501b7-6fd6-45f5-b508-240f8a3c384e", "created": "2025-04-15T02:07:21.178939+00:00"}

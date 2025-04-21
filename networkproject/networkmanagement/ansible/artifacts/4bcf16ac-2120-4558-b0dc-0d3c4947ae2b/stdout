@@ -1,0 +1,10 @@
+[0;31mERROR! 'ios_lines' is not a valid attribute for a Play[0m
+[0;31m[0m
+[0;31mThe error appears to be in '/home/kali/Desktop/fyp/networkproject/networkmanagement/ansible/banner.yml': line 11, column 3, but may[0m
+[0;31mbe elsewhere in the file depending on the exact syntax problem.[0m
+[0;31m[0m
+[0;31mThe offending line appears to be:[0m
+[0;31m[0m
+[0;31m[0m
+[0;31m- name: Save the configuration[0m
+[0;31m  ^ here[0m

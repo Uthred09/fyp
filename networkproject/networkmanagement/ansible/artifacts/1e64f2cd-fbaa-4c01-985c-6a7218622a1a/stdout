@@ -1,0 +1,9 @@
+
+PLAY [Check if device is reachable] ********************************************
+
+TASK [Ping the device] *********************************************************
+[0;31mfatal: [localhost]: FAILED! => {"changed": true, "cmd": "ping -c 1 -W 1 ", "delta": "0:00:00.003967", "end": "2025-04-15 02:18:36.192380", "msg": "non-zero return code", "rc": 1, "start": "2025-04-15 02:18:36.188413", "stderr": "ping: usage error: Destination address required", "stderr_lines": ["ping: usage error: Destination address required"], "stdout": "", "stdout_lines": []}[0m
+[0;36m...ignoring[0m
+
+PLAY RECAP *********************************************************************
+[0;33mlocalhost[0m                  : [0;32mok=1   [0m [0;33mchanged=1   [0m unreachable=0    failed=0    skipped=0    rescued=0    [1;35mignored=1   [0m

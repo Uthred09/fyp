@@ -1,0 +1,224 @@
+{% extends '../base.html' %}
+{% block content %}
+
+  <title>Network Management Dashboard</title>
+  <style>
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    .device-card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+      border-left: 6px solid #2196F3;
+      transition: 0.3s;
+    }
+
+    .device-card:hover {
+      transform: scale(1.01);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-dot {
+      height: 15px;
+      width: 15px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    input[type="text"] {
+      padding: 6px;
+      width: 60%;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 6px 12px;
+      background-color: #2196F3;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    button:hover {
+      background-color: #0b7dda;
+    }
+
+    .field-group {
+      margin-top: 10px;
+    }
+
+  </style>
+
+  <h2>Network Management</h2>
+  <form style="display:none">{% csrf_token %}</form> <!-- CSRF for JavaScript -->
+
+  {% for device in devices %}
+    <div class="device-card" id="card-{{ device.ip_address }}">
+      <div class="device-header">
+        <h3>{{ device.hostname }} ({{ device.ip_address }})</h3>
+        <span class="status-dot" id="status-{{ device.ip_address }}" style="background-color: grey;"></span>
+      </div>
+
+      <div class="field-group">
+        <input type="text" placeholder="New Hostname" id="hostname-{{ device.ip_address }}">
+        <button onclick="changeHostname('{{ device.ip_address }}')">Change Hostname</button>
+      </div>
+
+      <div class="field-group">
+        <button onclick="pingDevice('{{ device.ip_address }}')">Ping Device</button>
+      </div>
+
+      <div class="field-group">
+        <input type="text" placeholder="Banner MOTD" id="motd-{{ device.ip_address }}">
+        <button onclick="setMOTD('{{ device.ip_address }}')">Set MOTD</button>
+      </div>
+
+      <div class="field-group">
+        <input type="text" placeholder="VTY Password" id="vty-{{ device.ip_address }}">
+        <button onclick="setVTYPassword('{{ device.ip_address }}')">Set VTY Password</button>
+      </div>
+
+      <div class="field-group">
+        <input type="text" placeholder="Console Password" id="console-{{ device.ip_address }}">
+        <button onclick="setConsolePassword('{{ device.ip_address }}')">Set Console Password</button>
+      </div>
+      <div>
+        <input type="text" placeholder="VLAN ID" id="vlan-id-{{ device.ip_address }}">
+        <input type="text" placeholder="VLAN Name" id="vlan-name-{{ device.ip_address }}">
+        <input type="text" placeholder="Interface (e.g. Gi0/1)" id="vlan-iface-{{ device.ip_address }}">
+        <select id="vlan-mode-{{ device.ip_address }}">
+        <option value="access">Access</option>
+        <option value="trunk">Trunk</option>
+        </select>
+        <button onclick="createVLAN('{{ device.ip_address }}')">Create VLAN</button>
+      </div>
+      {% comment %} <div>
+        <h3>Select Device</h3>
+        <select id="device-select">
+            {% for device in devices %}
+                <option value="{{ device.ip_address }}" data-device-type="{{ device.device_type }}">
+                    {{ device.hostname }} ({{ device.ip_address }})
+                </option>
+            {% endfor %}
+        </select>
+    </div> {% endcomment %}
+    
+    {% comment %} <div id="acl-config" style="display: none;">
+        <h3>Configure ACL</h3>
+        <textarea id="acl-rules" placeholder="Enter ACL rules..."></textarea>
+        <button onclick="applyACL()">Apply ACL</button>
+    </div> {% endcomment %}
+    </div>
+  {% endfor %}
+
+  <script>
+    function getCSRFToken() {
+      return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    function changeHostname(ip) {
+      const hostname = document.getElementById(`hostname-${ip}`).value;
+      fetch('/networkmanagement/change-hostname/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: `ip=${ip}&hostname=${hostname}`
+      }).then(res => res.json()).then(data => alert(data.message));
+    }
+
+    function pingDevice(ip) {
+        const target = document.getElementById(`ping-ip-${ip}`).value;
+        statusDot.style.backgroundColor = 'gray'; // Reset while checking
+
+      fetch('/networkmanagement/ping/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: `ip=${ip}&target=${ip}`
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          statusDot.style.backgroundColor = 'green';
+        } else {
+          statusDot.style.backgroundColor = 'red';
+        }
+        alert(data.message);
+      });
+    }
+
+    function setMOTD(ip) {
+      const motd = document.getElementById(`motd-${ip}`).value;
+      fetch('/networkmanagement/set-motd/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: `ip=${ip}&motd=${motd}`
+      }).then(res => res.json()).then(data => alert(data.message));
+    }
+
+    function setVTYPassword(ip) {
+      const pwd = document.getElementById(`vty-${ip}`).value;
+      fetch('/networkmanagement/set-vty/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: `ip=${ip}&vty_password=${pwd}`
+      }).then(res => res.json()).then(data => alert(data.message));
+    }
+
+    function setConsolePassword(ip) {
+      const pwd = document.getElementById(`console-${ip}`).value;
+      fetch('/networkmanagement/set-console/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: `ip=${ip}&console_password=${pwd}`
+      }).then(res => res.json()).then(data => alert(data.message));
+    }
+    function createVLAN(ip) {
+        const vlan_id = document.getElementById(`vlan-id-${ip}`).value;
+        const vlan_name = document.getElementById(`vlan-name-${ip}`).value;
+        const iface = document.getElementById(`vlan-iface-${ip}`).value;
+        const mode = document.getElementById(`vlan-mode-${ip}`).value;
+    
+        fetch('/networkmanagement/create-vlan/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: `ip=${ip}&vlan_id=${vlan_id}&vlan_name=${vlan_name}&interface=${iface}&mode=${mode}`
+        })
+        .then(res => res.json())
+        .then(data => alert(data.message));
+    }
+  </script>
+{% endblock %}

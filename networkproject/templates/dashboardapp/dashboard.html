@@ -1,4 +1,4 @@
-{% extends 'dashboardapp/base.html' %}
+{% extends '../base.html' %}
 
 {% block content %}
 <h1>Devices</h1>
@@ -112,7 +112,6 @@
   }
 </style>
 
-<!-- JavaScript to Toggle Details -->
 <script>
   function toggleDetails(deviceId) {
     var row = document.getElementById("device-" + deviceId);

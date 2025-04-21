@@ -70,3 +70,4 @@ class DeviceResource(models.Model):
 
     def __str__(self):
         return f"{self.device.hostname} - CPU: {self.cpu_usage}%, Mem: {self.mem_usage}%"
+

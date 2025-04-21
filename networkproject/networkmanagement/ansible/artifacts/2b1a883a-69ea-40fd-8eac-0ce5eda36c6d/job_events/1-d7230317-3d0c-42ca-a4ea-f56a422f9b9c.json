@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "d7230317-3d0c-42ca-a4ea-f56a422f9b9c", "counter": 1, "stdout": "\u001b[0;31mERROR! the playbook: ping.yml could not be found\u001b[0m", "start_line": 0, "end_line": 1, "runner_ident": "2b1a883a-69ea-40fd-8eac-0ce5eda36c6d", "created": "2025-03-25T10:27:05.595978+00:00"}

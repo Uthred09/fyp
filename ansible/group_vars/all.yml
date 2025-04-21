@@ -1,6 +1,0 @@
-#The variable define here is apllied for all the devices regarding of routers or switches
-
-
-snmp_location: "DataCenter1"
-snmp_contact: "admin@example.com"
-trap_host_ip: "192.168.10.2"

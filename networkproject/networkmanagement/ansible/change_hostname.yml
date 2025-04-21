@@ -1,0 +1,9 @@
+- name: Hostname Configuration
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Set a new hostname
+      ios_config:
+        lines:
+          - "hostname {{ new_hostname }}"
+

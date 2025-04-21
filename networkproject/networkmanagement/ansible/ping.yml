@@ -1,0 +1,8 @@
+- name: Check if device is reachable
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Ping the device
+      shell: ping -c 1 -W 1 {{ target_ip }}
+      register: ping_result
+      ignore_errors: yes

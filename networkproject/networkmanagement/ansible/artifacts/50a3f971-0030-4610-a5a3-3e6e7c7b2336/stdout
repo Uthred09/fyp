@@ -1,0 +1,8 @@
+
+PLAY [Connectivity Test] *******************************************************
+
+TASK [Ping a remote device from the router] ************************************
+[0;31mfatal: [192.168.10.5]: FAILED! => {"changed": false, "msg": "ssh connection failed: ssh connect failed: No route to host"}[0m
+
+PLAY RECAP *********************************************************************
+[0;31m192.168.10.5[0m               : ok=0    changed=0    unreachable=0    [0;31mfailed=1   [0m skipped=0    rescued=0    ignored=0   

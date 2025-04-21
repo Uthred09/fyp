@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "f4450835-332e-40ae-b64a-d31a6d933f39", "counter": 1, "stdout": "\u001b[0;31mERROR! the playbook: vlan_config.yml could not be found\u001b[0m", "start_line": 0, "end_line": 1, "runner_ident": "4817948e-d067-4eea-aa1f-4446d969ea9c", "created": "2025-04-15T02:41:31.361573+00:00"}

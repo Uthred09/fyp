@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "b359acaa-ed06-4883-ad04-2aef9025a8ca", "counter": 3, "stdout": "\u001b[1;35mthe implicit localhost does not match 'all'\u001b[0m", "start_line": 2, "end_line": 3, "runner_ident": "networkmanagement/ansible/tmp/inventory.ini", "created": "2025-04-02T09:15:14.158912+00:00"}

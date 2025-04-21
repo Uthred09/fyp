@@ -1,0 +1,14 @@
+---
+- name: Set MOTD Banner
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Apply MOTD banner
+      ios_config:
+        lines:
+          - "banner motd ^{{ banner }}^"
+
+    - name: Save configuration (write memory)
+      ios_command:
+        commands:
+          - "write memory"

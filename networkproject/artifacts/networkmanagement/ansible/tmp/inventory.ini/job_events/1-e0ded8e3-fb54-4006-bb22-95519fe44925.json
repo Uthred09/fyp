@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "e0ded8e3-fb54-4006-bb22-95519fe44925", "counter": 1, "stdout": "\u001b[1;35m[WARNING]: No inventory was parsed, only implicit localhost is available\u001b[0m", "start_line": 0, "end_line": 1, "runner_ident": "networkmanagement/ansible/tmp/inventory.ini", "created": "2025-04-02T09:15:14.155252+00:00"}

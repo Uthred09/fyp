@@ -1,0 +1,31 @@
+---
+- name: SNMP Configuration
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - name: Set SNMP read-only community
+      ios_config:
+        lines:
+          - "snmp-server community {{ snmp_community | default('public') }} RO"
+
+    - name: Set SNMP location
+      ios_config:
+        lines:
+          - "snmp-server location {{ snmp_location | default('DataCenter1') }}"
+
+    - name: Set SNMP contact
+      ios_config:
+        lines:
+          - "snmp-server contact {{ snmp_contact | default('admin@example.com') }}"
+
+    - name: Enable SNMP traps
+      ios_config:
+        lines:
+          - "snmp-server enable traps snmp linkdown linkup"
+
+    - name: Configure SNMP trap destination
+      ios_config:
+        lines:
+          - "snmp-server host {{ snmp_host | default('192.168.10.2') }} version 2c {{ snmp_community | default('public') }}"

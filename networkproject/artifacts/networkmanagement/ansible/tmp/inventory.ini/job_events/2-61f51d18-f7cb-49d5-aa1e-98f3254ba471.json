@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "61f51d18-f7cb-49d5-aa1e-98f3254ba471", "counter": 2, "stdout": "\u001b[1;35m[WARNING]: provided hosts list is empty, only localhost is available. Note that\u001b[0m", "start_line": 1, "end_line": 2, "runner_ident": "networkmanagement/ansible/tmp/inventory.ini", "created": "2025-04-02T09:15:14.158718+00:00"}

@@ -1,0 +1,1 @@
+{"event": "verbose", "uuid": "d1048457-5695-4f00-b5cf-840231111aa4", "counter": 1, "stdout": "\u001b[0;31mERROR! 'ios_lines' is not a valid attribute for a Play\u001b[0m", "start_line": 0, "end_line": 1, "runner_ident": "4bcf16ac-2120-4558-b0dc-0d3c4947ae2b", "created": "2025-04-15T02:12:15.442878+00:00"}

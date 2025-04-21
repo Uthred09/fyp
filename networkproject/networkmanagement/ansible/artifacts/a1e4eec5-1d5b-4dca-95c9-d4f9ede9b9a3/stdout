@@ -1,0 +1,15 @@
+
+PLAY [Create VLAN and assign it to interface] **********************************
+
+TASK [Create VLAN] *************************************************************
+[1;35mdevice[0m
+[0;33mchanged: [192.168.10.5][0m
+
+TASK [Configure interface as access or trunk and assign VLAN] ******************
+[0;33mchanged: [192.168.10.5][0m
+
+TASK [Save configuration] ******************************************************
+[0;32mok: [192.168.10.5][0m
+
+PLAY RECAP *********************************************************************
+[0;33m192.168.10.5[0m               : [0;32mok=3   [0m [0;33mchanged=2   [0m unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   

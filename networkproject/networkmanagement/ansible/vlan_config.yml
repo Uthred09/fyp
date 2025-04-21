@@ -1,0 +1,31 @@
+- name: Create VLAN and assign it to interface
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - name: Create VLAN
+      ios_config:
+        lines:
+          - name {{ vlan_name }}
+        parents: vlan {{ vlan_id }}
+
+    - name: Configure interface as access or trunk and assign VLAN
+      ios_config:
+        lines: >
+          {{
+            [
+              'switchport mode access',
+              'switchport access vlan ' + vlan_id
+            ] if mode == 'access' else [
+              'switchport trunk encapsulation dot1q',
+              'switchport mode trunk',
+              'switchport trunk allowed vlan ' + vlan_id
+            ]
+          }}
+        parents: interface {{ interface }}
+
+    - name: Save configuration
+      ios_command:
+        commands:
+          - write memory
